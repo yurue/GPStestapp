@@ -28,8 +28,9 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
     private static final int LOCATION_UPDATE_MIN_TIME = 0;
     private static final int LOCATION_UPDATE_MIN_DISTANCE = 1;
     private static final int MY_PERMISSIONS_REQUEST_LOCATION = 1;
-    int providerflag = 0;
+    private int providerflag = 0;
     private boolean isNetworkEnabled;
+    private int count = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,13 +47,11 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
     private void requestLocationUpdates() {
         propermissioncheck();
         isNetworkEnabled = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        if(providerflag != 11){
+        if (providerflag != 11) {
             providerflag = 1;
         }
         if (isNetworkEnabled != true || providerflag == 11) {
             isNetworkEnabled = mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-            String message1 = "無効になっています";
-            showMessage(message1);
             providerflag = 2;
             if (isNetworkEnabled != true) {
                 String message = "Networkが無効になっています";
@@ -73,9 +72,12 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
         );
 
         Location location = mLocationManager.getLastKnownLocation(provider(providerflag));
-        if(location==null){
+
+        if (location == null) {
             providerflag = 11;
-            requestLocationUpdates();
+            count++;
+            if (count < 5)
+                requestLocationUpdates();
         }
         if (location != null) {
             showLocation(location);//　位置情報を表示する
@@ -118,7 +120,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
         return LocationManager.NETWORK_PROVIDER;
 
     }
-// パーミッション関係ここまで
+
+    // パーミッション関係ここまで
 // プロバイダ関係
     @Override
     public void onLocationChanged(Location location) {// 位置が変わったら
@@ -142,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener, 
             case LocationProvider.AVAILABLE:
                 if (provider.equals(provider(providerflag))) {
                     String avalialeMessage = provider + "が利用できます";
-                    showMessage(String.valueOf(providerflag));
+                    showMessage(avalialeMessage);
                     requestLocationUpdates();
                 }
                 break;
